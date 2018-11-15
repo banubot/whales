@@ -11,7 +11,7 @@ public class Bomb {
 	boolean exploded; 
 	ImageView displayImg; 
 
-	static Image bomb = new Image("bomb.jpg");
+	static Image bomb = new Image("bomb.png");
 	static Image explode = new Image("explode.png");
 	static final int MAX = 100; //max units til explode
 
