@@ -18,7 +18,7 @@ import javafx.scene.control.ChoiceBox;
 public class GUI extends Application implements Runnable {
 	//I made this global so the whales/bomb can be 
 	//added to it later
-	static AnchorPane pane = new AnchorPane();
+	AnchorPane pane = new AnchorPane();
 
 	public void run() {
 		launch();
@@ -27,6 +27,7 @@ public class GUI extends Application implements Runnable {
 	public void start(Stage stage) {
 		stage.setTitle("Something about whales...");
 	  	stage.setScene(new Scene(pane));
+		pane = new AnchorPane();
 		
 		//background
 		Image ocean = new Image("file:bkg.gif");		  
