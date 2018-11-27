@@ -16,7 +16,6 @@ public class Bomb {
 	static final int MAX = 100; //max units til explode
 
 	public Bomb() {
-		this.explodeCounter = (int) Math.random() * MAX;
 		this.displayImg = new ImageView();
 		this.displayImg.setImage(bomb);
 		this.exploded = false; 
