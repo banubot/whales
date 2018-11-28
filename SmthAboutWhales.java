@@ -37,16 +37,23 @@ public class SmthAboutWhales {
 				}
 				for (Whale whale : whales) {
 					if (whale != you) {
-						whale.send.print(holdTime);
-						whale.send.print(nextPlayer);
+						try {
+							whale.send.writeObject(holdTime);
+							whale.send.writeObject(nextPlayer);
+						} catch (IOException e) {
+							System.err.println(e);
+						}
 					}
 				}
 			} else {
 				for (Whale whale : whales) {
 					if (whale.yourTurn) {
-						holdTime = whale.recieve.nextInt();
-						nextPlayer = whale.recieve.nextInt();
-						
+						try {
+							holdTime = (int) whale.recieve.readObject();
+							nextPlayer = (int) whale.recieve.readObject();
+						} catch (Exception e) {
+							System.err.println(e);
+						}
 						bomb.hold(holdTime);
 						if (bomb.isExploded()) {
 							bomb.explode();
@@ -97,13 +104,21 @@ public class SmthAboutWhales {
 			bomb.explodeCounter = (int) Math.random() * Bomb.MAX;
 			for (Whale player : players) {
 				if (player.playerNum != thisPlayer) {
-					player.send.print(bomb.explodeCounter);
+					try {
+						player.send.writeObject(bomb.explodeCounter);
+					} catch (Exception e) {
+						System.err.println(e);
+					}
 				}
 			}
 		} else {
 			for (Whale player : players) {
 				if (player.playerNum == 1) {
-					bomb.explodeCounter = player.recieve.nextInt(); 
+					try {
+						bomb.explodeCounter = (int) player.recieve.readObject(); 
+					} catch (Exception e) {
+						System.err.println(e);
+					}
 				}
 			}
 		}
@@ -125,14 +140,24 @@ public class SmthAboutWhales {
 				ServerSocket sv = new ServerSocket(1200);
 				InetAddress inetAddr;
 				Socket p2sock;
-				while (true) {
+				int numPlayers = 1;
+				while (numPlayers < 4) {
 					System.out.println("Waiting for connection...");
 					p2sock = sv.accept();
-					Scanner in2 = new Scanner(p2sock.getInputStream());
-					System.out.println(in2.nextLine());
+					System.out.println("Accepted a socket: "+p2sock);
+					ObjectInputStream inputFromClient = new ObjectInputStream(p2sock.getInputStream());
+
+					String line = "";
+					try {
+						line = (String) inputFromClient.readObject();
+					} catch (Exception e) {
+						System.err.println("Reading in object error");
+					}
+					System.out.println(line);
+					numPlayers++;
 				}
 			} catch (IOException e) {
-				System.out.println("Error: Could not establish server connection.");
+				System.out.println("Error: Could not establish server connection. "+e);
 				System.exit(1);
 			}
 				
@@ -145,7 +170,10 @@ public class SmthAboutWhales {
 			try {
 				Socket sock = new Socket(host, port);
 				PrintWriter out = new PrintWriter(sock.getOutputStream());
+				ObjectOutputStream outputToServer = new ObjectOutputStream(sock.getOutputStream());
+				outputToServer.writeObject("Hello world!");
 				out.println("Hello, world!");
+				while(true);
 			} catch (Exception e) {
 				System.out.println("Error: Host unknown.");
 				System.exit(1);

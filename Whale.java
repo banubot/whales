@@ -11,8 +11,8 @@ public class Whale {
 	boolean alive; 
 	boolean yourTurn;
 	ImageView displayImg; //maybe this will also have stuff 
-    Scanner recieve;
-	PrintWriter send;
+    ObjectInputStream recieve;
+	ObjectOutputStream send;
 
 	static Image happy = new Image("happy.png");
 	static Image sad = new Image("sad.png");
@@ -28,8 +28,8 @@ public class Whale {
 		this.displayImg.setImage(happy);
 		
 		try {
-			this.recieve = new Scanner(sock.getInputStream());
-			this.send = new PrintWriter(sock.getOutputStream());
+			this.recieve = new ObjectInputStream(sock.getInputStream());
+			this.send = new ObjectOutputStream(sock.getOutputStream());
 		} catch(IOException e) {
 			System.out.println("Error: Could not get streams from socket.");
 			System.exit(1);

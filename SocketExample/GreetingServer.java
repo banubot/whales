@@ -27,10 +27,8 @@ public class GreetingServer extends Thread {
                serverSocket.getLocalPort() + "...");
             Socket client = serverSocket.accept();
             
-            System.out.println("Just connected to " + client.getRemoteSocketAddress());
-            DataInputStream in = new DataInputStream(client.getInputStream());
-            
-			      ObjectOutputStream outputToClient = new ObjectOutputStream(client.getOutputStream());
+            System.out.println("Just connected to " + client.getRemoteSocketAddress());            
+			ObjectOutputStream outputToClient = new ObjectOutputStream(client.getOutputStream());
 			      ObjectInputStream inputFromClient = new ObjectInputStream(client.getInputStream());
 			      clientList.add(outputToClient);
 			      ClientHandler handler = new ClientHandler(inputFromClient, clientList);
