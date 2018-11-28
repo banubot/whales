@@ -14,27 +14,23 @@ public class Whale {
     ObjectInputStream recieve;
 	ObjectOutputStream send;
 
-	static Image happy = new Image("happy.png");
-	static Image sad = new Image("sad.png");
-	static Image dead = new Image("dead.png");
+//	static Image happy = new Image("happy.png");
+//	static Image sad = new Image("sad.png");
+//	static Image dead = new Image("dead.png");
     static final int canvasHeight = 400;
 	static final int canvasWidth = 400;
 
-	public Whale(int playerNum, Socket sock) {
+	public Whale(int playerNum, ObjectInputStream in, ObjectOutputStream out) {
 		this.playerNum = playerNum;
 		this.alive = true;
-		this.yourTurn = false;
-		this.displayImg = new ImageView();
-		this.displayImg.setImage(happy);
-		
-		try {
-			this.recieve = new ObjectInputStream(sock.getInputStream());
-			this.send = new ObjectOutputStream(sock.getOutputStream());
-		} catch(IOException e) {
-			System.out.println("Error: Could not get streams from socket.");
-			System.exit(1);
-		} 
-
+		this.yourTurn = (playerNum == 1);
+		//this.displayImg = new ImageView();
+//		this.displayImg.setImage(happy);
+	
+		//you will not have a socket to yourself
+		this.recieve = in;
+		this.send = out;
+/*		
 		//position this whale on canvas
 		switch (playerNum) {
 			case 0:
@@ -52,11 +48,11 @@ public class Whale {
 			case 3:
 				this.displayImg.setLayoutX(canvasWidth / 2);
 				this.displayImg.setLayoutY(canvasHeight - 40);
-		} 
+		} */
 	}
 
 	public void kill() {
 		alive = false;
-		displayImg.setImage(dead);
+	//	displayImg.setImage(dead);
 	} 
 } 
