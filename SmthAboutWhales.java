@@ -39,7 +39,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 			repl(thisPlayer, bomb, whales);
 			gameOver(whales);
 		} catch (Exception e) {
-			System.err.println("Error: Could not connect players. " + e);
+			e.printStackTrace();
 		}
 	}
 
@@ -64,12 +64,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 		stage.setTitle("Something about whales...");
 		AnchorPane pane = new AnchorPane();
 	  	stage.setScene(new Scene(pane));
-		try {
-			synchronized (monitor) {
-				monitor.wait();
-			}
-		} catch (Exception e)  {System.out.println("exception while waiting" +e);} //Will throw interrupted upon notify
-
+		
 		//background
 		Image ocean = new Image("file:bkg.gif");		  
 		ImageView bkg = new ImageView();
@@ -135,7 +130,8 @@ public class SmthAboutWhales extends Application implements Runnable {
 		Text throwTxt = new Text("throw to");
 		throwTo = new ChoiceBox<>();
 		throwTo.setStyle("-fx-background-color: #FFFFFF;");
-		throwTo.getItems().addAll("Player 1", "Player 3", "Player 4");
+		throwTo.getItems().addAll("Player 1", "Player 2",
+			   	"Player 3", "Player 4");
 		throwTxt.setLayoutX(255);
 		throwTxt.setLayoutY(532);
 		throwTo.setLayoutX(250);
@@ -149,6 +145,12 @@ public class SmthAboutWhales extends Application implements Runnable {
 		
 		pane.getChildren().addAll(bkg, rect, status, go, slideTxt, slide,
 				throwTxt, throwTo, title);
+		
+		try {
+			synchronized (monitor) {
+				monitor.wait();
+			}
+		} catch (Exception e)  {System.out.println("exception while waiting" +e);} //Will throw interrupted upon notify
 
 		 pane.getChildren().add(bomb.displayImg);
 		 for (Whale whale : whales) {
