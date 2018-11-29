@@ -36,11 +36,22 @@ public class SmthAboutWhales extends Application implements Runnable {
 			synchronized (monitor) {
 				monitor.notify(); 
 			}
+			repl(thisPlayer, bomb, whales);
+			gameOver(whales);
 		} catch (Exception e) {
 			System.err.println("Error: Could not connect players. " + e);
 		}
-		while(true);
-		//repl(thisPlayer, bomb, whales);
+	}
+
+
+	public static void gameOver(Whale[] whales) {
+		int winner = 0;
+		for (Whale whale : whales) {
+			if (whale.alive) {
+				winner = whale.playerNum;
+			}
+		}
+		status.setText("Game over! Player " + winner + " wins!!!");
 	}
 
 
@@ -150,8 +161,10 @@ public class SmthAboutWhales extends Application implements Runnable {
 
 	/* what to do each turn
 	 */
-	public static void repl(int thisPlayer, Bomb bomb, Whale[] whales) {
+	public static void repl(int thisPlayer, Bomb bomb, Whale[] whales) 
+		throws Exception {
 		status.setText("Ready to play!");
+		Thread.sleep(1000); //just so you have a chance to actually read it
 		Scanner scanny = new Scanner(System.in);
 		boolean playing = true;
 		int holdTime = 0; 
@@ -166,11 +179,9 @@ public class SmthAboutWhales extends Application implements Runnable {
 		while (playing) {
 			if (you.yourTurn) {
 				status.setText("It's your turn...");
-				try {
-					synchronized(monitor) {
-						monitor.wait();
-					}
-				} catch (Exception e) {}
+				synchronized(monitor) {
+					monitor.wait();
+				}
 
 				holdTime = (int) slide.getValue();
 				nextPlayer = Integer.valueOf(throwTo.getValue().charAt(7)); 
@@ -179,34 +190,43 @@ public class SmthAboutWhales extends Application implements Runnable {
 				//their turn is over
 				bomb.hold(holdTime);
 				if (bomb.isExploded()) {
-					status.setText("You are dead :(");
 					bomb.explode();
 					you.kill();
+					status.setText("You are dead :(");
+					Thread.sleep(2000);
 				}
+			    status.setText("Throwing the bomb to Player " + nextPlayer);
 				for (Whale whale : whales) {
 					if (whale != you) {
-						try {
-							whale.send.writeObject(holdTime);
-							whale.send.writeObject(nextPlayer);
-						} catch (IOException e) {
-							System.err.println(e);
-						}
+						whale.send.writeObject(holdTime);
+						whale.send.writeObject(nextPlayer);
 					}
 				}
 			} else {
 				for (Whale whale : whales) {
 					if (whale.yourTurn) {
-						try {
-							holdTime = (int) whale.recieve.readObject();
-							nextPlayer = (int) whale.recieve.readObject();
-						} catch (Exception e) {
-							System.err.println(e);
-						}
+						status.setText("Player " + whale.playerNum +
+								"'s turn...");
+						Thread.sleep(2000);
+						holdTime = (int) whale.recieve.readObject();
+						nextPlayer = (int) whale.recieve.readObject();
+						
 						bomb.hold(holdTime);
+						status.setText("Player " + whale.playerNum + 
+								" held the bomb for " + holdTime +
+								" seconds!");
+						Thread.sleep(2000);
 						if (bomb.isExploded()) {
 							bomb.explode();
 							whale.kill();
+							status.setText("Player " + whale.playerNum +
+									" died :(");
+							Thread.sleep(2000);
 						}
+						status.setText("Player " + whale.playerNum + 
+								" threw the bomb to Player " +
+								nextPlayer);
+						Thread.sleep(2000);
 					}
 				}
 			}
