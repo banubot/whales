@@ -187,6 +187,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 				}
 
 				holdTime = (int) slide.getValue();
+				//System.out.println(holdTime+"    "+bomb.explodeCounter);
 				nextPlayer = Integer.valueOf(throwTo.getValue().charAt(7)); 
 				//TODO GET THE SLIDEY FROM THE GUI BUT HOW?
 				//also need to remover player from slidey when 
