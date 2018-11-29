@@ -18,6 +18,7 @@ public class Bomb {
 	public Bomb() {
 		this.displayImg = new ImageView();
 		this.displayImg.setImage(bomb);
+		this.explodeCounter = (int) Math.random() * MAX;
 	}
 	
 	public void hold(int holdTime) {
