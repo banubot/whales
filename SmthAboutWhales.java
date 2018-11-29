@@ -12,7 +12,7 @@ import javafx.scene.paint.*;
 import javafx.scene.text.*;
 import javafx.scene.control.*;
 import java.lang.Thread.*;
-
+import javafx.event.*;
 
 public class SmthAboutWhales extends Application implements Runnable {
 	static Whale[] whales;
@@ -99,6 +99,14 @@ public class SmthAboutWhales extends Application implements Runnable {
 		go.setStyle("-fx-background-color: #FFFFFF;");
 		go.setLayoutX(400);
 		go.setLayoutY(550);
+		//set behavior of button when clicked
+		go.setOnAction(new EventHandler<ActionEvent>() {
+    		public void handle(ActionEvent e) {
+				synchronized(monitor) {
+					monitor.notify();
+				}
+			}
+		});
 		
 		//hold slider
 		Text slideTxt = new Text("hold");
@@ -139,20 +147,23 @@ public class SmthAboutWhales extends Application implements Runnable {
 		stage.show();
 	}	
 
+
 	/* what to do each turn
 	 */
 	public static void repl(int thisPlayer, Bomb bomb, Whale[] whales) {
+		status.setText("Ready to play!");
 		Scanner scanny = new Scanner(System.in);
 		boolean playing = true;
+		int holdTime = 0; 
+		int nextPlayer = 0;
 		Whale you = null;
 		for (Whale whale : whales) {
 			if (whale.playerNum == thisPlayer) {
 				you = whale;
 			}
 		}
+
 		while (playing) {
-			int holdTime = 0; //NO NOT ZERO
-			int nextPlayer = 0;
 			if (you.yourTurn) {
 				status.setText("It's your turn...");
 				try {
@@ -162,12 +173,13 @@ public class SmthAboutWhales extends Application implements Runnable {
 				} catch (Exception e) {}
 
 				holdTime = (int) slide.getValue();
-				nextPlayer = throwTo.getValue().charAt(-1); 
+				nextPlayer = Integer.valueOf(throwTo.getValue().charAt(7)); 
 				//TODO GET THE SLIDEY FROM THE GUI BUT HOW?
 				//also need to remover player from slidey when 
 				//their turn is over
 				bomb.hold(holdTime);
 				if (bomb.isExploded()) {
+					status.setText("You are dead :(");
 					bomb.explode();
 					you.kill();
 				}
