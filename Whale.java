@@ -7,10 +7,10 @@ import java.net.*;
 import java.io.*;
 
 public class Whale {
-	int playerNum; //0 - 3 
+	int playerNum; //1 - 4 
 	boolean alive; 
 	boolean yourTurn;
-	ImageView displayImg; //maybe this will also have stuff 
+	ImageView displayImg; 
     ObjectInputStream recieve;
 	ObjectOutputStream send;
 	int x;
@@ -35,25 +35,27 @@ public class Whale {
 
 		//position this whale on canvas
 		switch (playerNum) {
-			case 0:
+			case 1:
 				this.x = 10;
 				this.y = canvasHeight / 2 + 10;
 				break;
-			case 1:
+			case 2:
 			    this.x = canvasWidth / 2;	
 				this.y = 20;
 				break;
-			case 2:
+			case 3:
 				this.x = canvasWidth - 10;
 				this.y = canvasHeight / 2 + 10;
 				break;
-			case 3:
+			case 4:
 				this.x = canvasWidth / 2;
 				this.y = canvasHeight - 40;
-
-			this.displayImg.setLayoutX(this.x);
-			this.displayImg.setLayoutY(this.y);
 		} 
+	}
+
+	public void move() {
+		this.displayImg.setLayoutX(this.x);
+		this.displayImg.setLayoutY(this.y);
 	}
 
 	public void kill() {

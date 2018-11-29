@@ -156,6 +156,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 		 pane.getChildren().add(bomb.displayImg);
 		 for (Whale whale : whales) {
 			 pane.getChildren().add(whale.displayImg);
+			 whale.move();
 		 }
 
 		stage.show();
