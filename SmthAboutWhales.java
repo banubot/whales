@@ -1,22 +1,143 @@
 import java.util.*;
 import java.net.*; 
 import java.io.*;
+import javafx.application.Application;
+import javafx.scene.*;
+import javafx.stage.Stage;
+import javafx.scene.shape.*;
+import javafx.scene.layout.*;
+import javafx.scene.image.*;
+import javafx.scene.effect.*;
+import javafx.scene.paint.*;
+import javafx.scene.text.*;
+import javafx.scene.control.*;
+import java.lang.Thread.*;
 
 
-public class SmthAboutWhales {
+public class SmthAboutWhales extends Application implements Runnable {
+	static Whale[] whales;
+	static Bomb bomb;
+	static Boolean monitor = false;
+	static Text status;
+	static Button go;
+	static Slider slide;
+	static ChoiceBox<String> throwTo;
+	
 	public static void main(String[] args) {
 		Scanner scanny = new Scanner(System.in);
 		System.out.print("Welcome to the ocean! What player are you? ");
+		int thisPlayer;
+		Thread gui = new Thread(new SmthAboutWhales());
+		gui.start();
 		try {
-			Whale[] whales = connectPlayers(scanny.nextInt());
+			thisPlayer = scanny.nextInt();
+			whales = connectPlayers(thisPlayer);
+			bomb = createBomb(thisPlayer, whales);
+			synchronized (monitor) {
+				monitor.notify(); 
+			}
 		} catch (Exception e) {
 			System.err.println("Error: Could not connect players. " + e);
 		}
 		while(true);
-	    //Bomb bomb = createBomb(thisPlayer, whales);
 		//repl(thisPlayer, bomb, whales);
 	}
 
+
+	public void run() {
+		launch();
+	}
+	
+
+	public void start(Stage stage) {
+		stage.setTitle("Something about whales...");
+		AnchorPane pane = new AnchorPane();
+	  	stage.setScene(new Scene(pane));
+		try {
+			synchronized (monitor) {
+				monitor.wait();
+			}
+		} catch (Exception e)  {System.out.println("exception while waiting" +e);} //Will throw interrupted upon notify
+
+		//background
+		Image ocean = new Image("file:bkg.gif");		  
+		ImageView bkg = new ImageView();
+	    bkg.setImage(ocean);	
+		
+		//control box
+		Rectangle rect = new Rectangle(500,150);
+		rect.setLayoutX(0);
+		rect.setLayoutY(466); 
+		rect.setFill(Color.rgb(0, 255, 252, 0.6));
+		DropShadow dropShadow = new DropShadow();
+		dropShadow.setRadius(5.0);
+		dropShadow.setOffsetY(-1.0);
+		dropShadow.setColor(Color.rgb(85,87,83,0.2));
+		rect.setEffect(dropShadow);
+		
+		//font
+		Font font = null;
+		try {
+			font = Font.loadFont(new FileInputStream(new File("font.ttf")), 18);
+		} catch (FileNotFoundException e) {
+			System.out.println("Error: Could not load font.");
+		}
+		
+		//action status - can be changed to things like 
+		//your turn
+		//player _ exploded
+		//player _ threw the bomb to player _
+		status = new Text("Player 3 held the bomb for 3 seconds!");
+		status.setFont(font);
+		status.setLayoutX(5);
+		status.setLayoutY(495);
+
+		//TODO set event handlers 
+		//button
+		go = new Button("go!");
+		go.setFont(font);
+		go.setStyle("-fx-background-color: #FFFFFF;");
+		go.setLayoutX(400);
+		go.setLayoutY(550);
+		
+		//hold slider
+		Text slideTxt = new Text("hold");
+	    slide = new Slider(1, 10, 1);
+		slideTxt.setLayoutX(40);
+		slideTxt.setLayoutY(532);
+		slide.setLayoutX(35);
+		slide.setLayoutY(550);
+		slide.setShowTickMarks(true);
+		slide.setShowTickLabels(true);
+		slide.setMajorTickUnit(3);
+		slide.setSnapToTicks(true);
+		
+		//choose victim
+		Text throwTxt = new Text("throw to");
+		throwTo = new ChoiceBox<>();
+		throwTo.setStyle("-fx-background-color: #FFFFFF;");
+		throwTo.getItems().addAll("Player 1", "Player 3", "Player 4");
+		throwTxt.setLayoutX(255);
+		throwTxt.setLayoutY(532);
+		throwTo.setLayoutX(250);
+		throwTo.setLayoutY(550);
+		
+		//top banner
+		Text title = new Text("Something about whales!");
+		title.setLayoutX(100);
+		title.setLayoutY(20);
+		title.setFont(font);
+		
+		pane.getChildren().addAll(bkg, rect, status, go, slideTxt, slide,
+				throwTxt, throwTo, title);
+
+		 pane.getChildren().add(bomb.displayImg);
+		 for (Whale whale : whales) {
+			 pane.getChildren().add(whale.displayImg);
+		 }
+
+		stage.show();
+	}	
 
 	/* what to do each turn
 	 */
@@ -32,7 +153,16 @@ public class SmthAboutWhales {
 		while (playing) {
 			int holdTime = 0; //NO NOT ZERO
 			int nextPlayer = 0;
-			if (you.yourTurn) {	
+			if (you.yourTurn) {
+				status.setText("It's your turn...");
+				try {
+					synchronized(monitor) {
+						monitor.wait();
+					}
+				} catch (Exception e) {}
+
+				holdTime = (int) slide.getValue();
+				nextPlayer = throwTo.getValue().charAt(-1); 
 				//TODO GET THE SLIDEY FROM THE GUI BUT HOW?
 				//also need to remover player from slidey when 
 				//their turn is over
