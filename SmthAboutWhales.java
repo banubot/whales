@@ -33,6 +33,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 			thisPlayer = scanny.nextInt();
 			whales = connectPlayers(thisPlayer);
 			bomb = createBomb(thisPlayer, whales);
+			
 			synchronized (monitor) {
 				monitor.notify(); 
 			}
@@ -166,7 +167,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 	public static void repl(int thisPlayer, Bomb bomb, Whale[] whales) 
 		throws Exception {
 		status.setText("Ready to play!");
-		Thread.sleep(1000); //just so you have a chance to actually read it
+		Thread.sleep(4000); //just so you have a chance to actually read it
 		Scanner scanny = new Scanner(System.in);
 		boolean playing = true;
 		int holdTime = 0; 
@@ -187,8 +188,8 @@ public class SmthAboutWhales extends Application implements Runnable {
 				}
 
 				holdTime = (int) slide.getValue();
-				//System.out.println(holdTime+"    "+bomb.explodeCounter);
-				nextPlayer = Integer.valueOf(throwTo.getValue().charAt(7)); 
+				System.out.println(holdTime+"    "+bomb.explodeCounter);
+				nextPlayer = Integer.parseInt(Character.toString(throwTo.getValue().charAt(7))); 
 				//TODO GET THE SLIDEY FROM THE GUI BUT HOW?
 				//also need to remover player from slidey when 
 				//their turn is over
@@ -197,7 +198,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 					bomb.explode();
 					you.kill();
 					status.setText("You are dead :(");
-					Thread.sleep(2000);
+					Thread.sleep(4000);
 					bomb = createBomb(you.playerNum, whales);
 				}
 			    status.setText("Throwing the bomb to Player " + nextPlayer);
@@ -207,13 +208,14 @@ public class SmthAboutWhales extends Application implements Runnable {
 						whale.send.writeObject(nextPlayer);
 					}
 				}
+				Thread.sleep(4000);
 			} else {
 				for (Whale whale : whales) {
 					if (whale.yourTurn) {
 						bomb.move(whale.x, whale.y);
 						status.setText("Player " + whale.playerNum +
 								"'s turn...");
-						Thread.sleep(2000);
+						Thread.sleep(4000);
 						holdTime = (int) whale.recieve.readObject();
 						nextPlayer = (int) whale.recieve.readObject();
 						
@@ -221,19 +223,19 @@ public class SmthAboutWhales extends Application implements Runnable {
 						status.setText("Player " + whale.playerNum + 
 								" held the bomb for " + holdTime +
 								" seconds!");
-						Thread.sleep(2000);
+						Thread.sleep(4000);
 						if (bomb.isExploded()) {
 							bomb.explode();
 							whale.kill();
 							throwTo.getItems().remove("Player "+whale.playerNum);
 							status.setText("Player " + whale.playerNum +
 									" died :(");
-							Thread.sleep(2000);
+							Thread.sleep(4000);
 						}
 						status.setText("Player " + whale.playerNum + 
 								" threw the bomb to Player " +
 								nextPlayer);
-						Thread.sleep(2000);
+						Thread.sleep(4000);
 					}
 				}
 			}
@@ -265,7 +267,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 				numDead++;
 			}
 		}
-		return (numDead == 3);
+		return (numDead != 3);
 	}
 
 
@@ -276,7 +278,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 	public static Bomb createBomb(int thisPlayer, Whale[] players) {
 		Bomb bomb = new Bomb();
 		if (thisPlayer == 1) {
-			bomb.explodeCounter = (int) Math.random() * Bomb.MAX;
+			bomb.explodeCounter = (int) (Math.random() * Bomb.MAX);
 			for (Whale player : players) {
 				if (player.playerNum != thisPlayer) {
 					try {
@@ -445,9 +447,4 @@ public class SmthAboutWhales extends Application implements Runnable {
 		return whales; 
 	}
 
-
-	public static void makeGui() {
-		GUI gui = new GUI();
-		(new Thread(gui)).start();
-	}
 }
