@@ -4,7 +4,6 @@
  */
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import java.lang.Math;
 
 public class Bomb {
 	int explodeCounter; 
@@ -18,7 +17,6 @@ public class Bomb {
 	public Bomb() {
 		this.displayImg = new ImageView();
 		this.displayImg.setImage(bomb);
-		this.explodeCounter = (int) Math.random() * MAX;
 	}
 	
 	public void hold(int holdTime) {
