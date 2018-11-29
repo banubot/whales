@@ -18,7 +18,6 @@ public class Bomb {
 	public Bomb() {
 		this.displayImg = new ImageView();
 		this.displayImg.setImage(bomb);
-		this.exploded = false; 
 	}
 	
 	public void hold(int holdTime) {
@@ -36,6 +35,6 @@ public class Bomb {
 
 	public void explode() {
 		displayImg.setImage(explode);
-		exploded = true;
-	} 
+	}
+
 } 

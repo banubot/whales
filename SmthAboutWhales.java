@@ -178,6 +178,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 
 		while (playing) {
 			if (you.yourTurn) {
+				bomb.move(you.x, you.y);
 				status.setText("It's your turn...");
 				synchronized(monitor) {
 					monitor.wait();
@@ -194,6 +195,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 					you.kill();
 					status.setText("You are dead :(");
 					Thread.sleep(2000);
+					bomb = createBomb(you.playerNum, whales);
 				}
 			    status.setText("Throwing the bomb to Player " + nextPlayer);
 				for (Whale whale : whales) {
@@ -205,6 +207,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 			} else {
 				for (Whale whale : whales) {
 					if (whale.yourTurn) {
+						bomb.move(whale.x, whale.y);
 						status.setText("Player " + whale.playerNum +
 								"'s turn...");
 						Thread.sleep(2000);
