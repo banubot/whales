@@ -61,5 +61,6 @@ public class Whale {
 	public void kill() {
 		alive = false;
 		displayImg.setImage(dead);
+		this.move();
 	} 
 } 

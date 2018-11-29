@@ -7,7 +7,6 @@ import javafx.scene.image.ImageView;
 
 public class Bomb {
 	int explodeCounter; 
-	boolean exploded; 
 	ImageView displayImg; 
 
 	static Image bomb = new Image("bomb.png");
@@ -35,5 +34,8 @@ public class Bomb {
 	public void explode() {
 		displayImg.setImage(explode);
 	}
-
+	
+	public void reset() {
+		displayImg.setImage(bomb);
+	}
 } 

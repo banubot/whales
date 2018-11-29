@@ -32,7 +32,8 @@ public class SmthAboutWhales extends Application implements Runnable {
 		try {
 			thisPlayer = scanny.nextInt();
 			whales = connectPlayers(thisPlayer);
-			bomb = createBomb(thisPlayer, whales);
+			bomb = new Bomb(); 
+			setBomb(thisPlayer, whales, bomb);
 			
 			synchronized (monitor) {
 				monitor.notify(); 
@@ -195,20 +196,23 @@ public class SmthAboutWhales extends Application implements Runnable {
 				//also need to remover player from slidey when 
 				//their turn is over
 				bomb.hold(holdTime);
-				if (bomb.isExploded()) {
-					bomb.explode();
-					you.kill();
-					status.setText("You are dead :(");
-					Thread.sleep(4000);
-					bomb = createBomb(you.playerNum, whales);
-				}
-			    status.setText("Throwing the bomb to Player " + nextPlayer);
+	
 				for (Whale whale : whales) {
 					if (whale != you) {
 						whale.send.writeObject(holdTime);
 						whale.send.writeObject(nextPlayer);
 					}
 				}
+
+				if (bomb.isExploded()) {
+					bomb.explode();
+					you.kill();
+					status.setText("You are dead :(");
+					Thread.sleep(4000);
+					bomb.reset();
+					setBomb(you.playerNum, whales, bomb);
+				}
+			    status.setText("Throwing the bomb to Player " + nextPlayer);
 				Thread.sleep(4000);
 			} else {
 				for (Whale whale : whales) {
@@ -232,6 +236,8 @@ public class SmthAboutWhales extends Application implements Runnable {
 							status.setText("Player " + whale.playerNum +
 									" died :(");
 							Thread.sleep(4000);
+							bomb.reset();
+							setBomb(you.playerNum, whales, bomb);
 						}
 						status.setText("Player " + whale.playerNum + 
 								" threw the bomb to Player " +
@@ -276,8 +282,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 	 * and send its info to the other players otherwise its not
 	 * going to be the same for each player
 	 */
-	public static Bomb createBomb(int thisPlayer, Whale[] players) {
-		Bomb bomb = new Bomb();
+	public static void setBomb(int thisPlayer, Whale[] players, Bomb bomb) {
 		if (thisPlayer == 1) {
 			bomb.explodeCounter = (int) (Math.random() * Bomb.MAX);
 			for (Whale player : players) {
@@ -300,11 +305,10 @@ public class SmthAboutWhales extends Application implements Runnable {
 				}
 			}
 		}
-		return bomb;
 	} 
 
 
-	/* TODO return a set of four whales with sockets between all
+	/* return a set of four whales with sockets between all
 	 * of them and player numbers assigned
 	 */ 
 	public static Whale[] connectPlayers(int playerNum) throws Exception {
@@ -336,7 +340,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 					new Whale(clientPlayerNum, inputFromClient, 
 							new ObjectOutputStream(sock.getOutputStream()));
 				if (clientPlayerNum == 2) {
-					addressP2 = sock.getInetAddress(); //TODO check might be getLocalAddress??
+					addressP2 = sock.getInetAddress();
 				}
 				if (clientPlayerNum == 3) {
 					addressP3 = sock.getInetAddress();
