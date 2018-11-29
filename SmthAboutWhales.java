@@ -224,6 +224,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 						if (bomb.isExploded()) {
 							bomb.explode();
 							whale.kill();
+							throwTo.getItems().remove("Player "+whale.playerNum);
 							status.setText("Player " + whale.playerNum +
 									" died :(");
 							Thread.sleep(2000);
