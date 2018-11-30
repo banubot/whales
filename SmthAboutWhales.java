@@ -47,13 +47,13 @@ public class SmthAboutWhales extends Application implements Runnable {
 
 
 	public static void gameOver(Whale[] whales) {
-		int winner = 0;
+		Whale winner = null;
 		for (Whale whale : whales) {
 			if (whale.alive) {
-				winner = whale.playerNum;
+				winner = whale;
 			}
 		}
-		status.setText("Game over! Player " + winner + " wins!!!");
+		status.setText("Game over! " + winner.name.getText() + " wins!!!");
 	}
 
 
@@ -187,16 +187,20 @@ public class SmthAboutWhales extends Application implements Runnable {
 				synchronized(monitor) {
 					monitor.wait();
 				}
-
-				holdTime = (int) slide.getValue();
-				//get the player from the choice box
-				System.out.println(holdTime+"    "+ bomb.explodeCounter);
-				String next = throwTo.getValue();
-				for (Whale whale : whales) {
-					if (whale.name.getText().equals(next)) {
-						nextPlayer = whale.playerNum;
+				boolean request = true;
+				while (request) {
+					holdTime = (int) slide.getValue();
+					//get the player from the choice box
+					System.out.println(holdTime+"    "+ bomb.explodeCounter);
+					String next = throwTo.getValue();
+					for (Whale whale : whales) {
+						if (whale.name.getText().equals(next)) {
+							nextPlayer = whale.playerNum;
+							request = false;
+						}
 					}
 				}
+
 				bomb.hold(holdTime);
 	
 				for (Whale whale : whales) {
