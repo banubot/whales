@@ -86,7 +86,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 		//font
 		Font font = null;
 		try {
-			font = Font.loadFont(new FileInputStream(new File("font.ttf")), 18);
+			font = Font.loadFont(new FileInputStream(new File("font2.ttf")), 18);
 		} catch (FileNotFoundException e) {
 			System.out.println("Error: Could not load font.");
 		}
@@ -132,8 +132,6 @@ public class SmthAboutWhales extends Application implements Runnable {
 		Text throwTxt = new Text("throw to");
 		throwTo = new ChoiceBox<>();
 		throwTo.setStyle("-fx-background-color: #FFFFFF;");
-		throwTo.getItems().addAll("Player 1", "Player 2",
-			   	"Player 3", "Player 4");
 		throwTxt.setLayoutX(255);
 		throwTxt.setLayoutY(532);
 		throwTo.setLayoutX(250);
@@ -156,7 +154,8 @@ public class SmthAboutWhales extends Application implements Runnable {
 
 		 pane.getChildren().add(bomb.displayImg);
 		 for (Whale whale : whales) {
-			 pane.getChildren().add(whale.displayImg);
+			 pane.getChildren().addAll(whale.displayImg, whale.name);
+			 throwTo.getItems().add(whale.name.getText());
 			 whale.move();
 		 }
 
@@ -190,11 +189,14 @@ public class SmthAboutWhales extends Application implements Runnable {
 				}
 
 				holdTime = (int) slide.getValue();
-				System.out.println(holdTime+"    "+bomb.explodeCounter);
-				nextPlayer = Integer.parseInt(Character.toString(throwTo.getValue().charAt(7))); 
-				//TODO GET THE SLIDEY FROM THE GUI BUT HOW?
-				//also need to remover player from slidey when 
-				//their turn is over
+				//get the player from the choice box
+				System.out.println(holdTime+"    "+ bomb.explodeCounter);
+				String next = throwTo.getValue();
+				for (Whale whale : whales) {
+					if (whale.name.equals(next)) {
+						nextPlayer = whale.playerNum;
+					}
+				}
 				bomb.hold(holdTime);
 	
 				for (Whale whale : whales) {
@@ -212,36 +214,36 @@ public class SmthAboutWhales extends Application implements Runnable {
 					bomb.reset();
 					setBomb(you.playerNum, whales, bomb);
 				}
-			    status.setText("Throwing the bomb to Player " + nextPlayer);
+			    status.setText("Throwing the bomb to " 
+						+ whales[nextPlayer - 1].name.getText());
 				Thread.sleep(4000);
 			} else {
 				for (Whale whale : whales) {
 					if (whale.yourTurn) {
 						bomb.move(whale.x, whale.y);
-						status.setText("Player " + whale.playerNum +
+						status.setText(whale.name.getText() +
 								"'s turn...");
 						Thread.sleep(4000);
 						holdTime = (int) whale.recieve.readObject();
 						nextPlayer = (int) whale.recieve.readObject();
 						
 						bomb.hold(holdTime);
-						status.setText("Player " + whale.playerNum + 
+						status.setText(whale.name.getText() + 
 								" held the bomb for " + holdTime +
 								" seconds!");
 						Thread.sleep(4000);
 						if (bomb.isExploded()) {
 							bomb.explode();
 							whale.kill();
-							throwTo.getItems().remove("Player "+whale.playerNum);
-							status.setText("Player " + whale.playerNum +
+							throwTo.getItems().remove(whale.name.getText());
+							status.setText(whale.name.getText() +
 									" died :(");
 							Thread.sleep(4000);
 							bomb.reset();
 							setBomb(you.playerNum, whales, bomb);
 						}
-						status.setText("Player " + whale.playerNum + 
-								" threw the bomb to Player " +
-								nextPlayer);
+						status.setText(whale.name.getText() + 
+								" threw the bomb to " + whales[nextPlayer - 1].name);
 						Thread.sleep(4000);
 					}
 				}
@@ -313,12 +315,15 @@ public class SmthAboutWhales extends Application implements Runnable {
 	 */ 
 	public static Whale[] connectPlayers(int playerNum) throws Exception {
 		Whale[] whales = new Whale[4];
-		Scanner scanny = new Scanner(System.in);	
+		Scanner scanny = new Scanner(System.in);
+		System.out.print("What is your name? ");
+		String yourName = scanny.nextLine();	
 	    InetAddress addressP2 = null; //for connecting 2 - 4 to eachother
 		InetAddress addressP3 = null;
 		int numPlayers;
 		int clientPlayerNum;
 		Socket sock;
+		String clientName;
 		//connect everyone to player 1
 		if (playerNum == 1) {
 			System.out.println("Establishing server...");
@@ -326,7 +331,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 			InetAddress inetAddr = sv.getInetAddress();
 			System.out.println("Server established at address " 
 					+ inetAddr + " port " + sv.getLocalPort());
-			whales[0] = new Whale(1, null, null);
+			whales[0] = new Whale(1, null, null, yourName);
 			numPlayers = 1;
 			while (numPlayers < 4) {
 				System.out.println("Waiting for connection...");
@@ -336,9 +341,13 @@ public class SmthAboutWhales extends Application implements Runnable {
 				clientPlayerNum = 0;
 				clientPlayerNum = (int) inputFromClient.readObject();
 				System.out.println("Connected to player " + clientPlayerNum);
+				clientName =  (String) inputFromClient.readObject();
+				System.out.println("You are playing against " + clientName);
+				ObjectOutputStream outputToClient = new ObjectOutputStream(sock.getOutputStream());
+				outputToClient.writeObject(yourName);
 				whales[clientPlayerNum - 1] = 
 					new Whale(clientPlayerNum, inputFromClient, 
-							new ObjectOutputStream(sock.getOutputStream()));
+							outputToClient, clientName);
 				if (clientPlayerNum == 2) {
 					addressP2 = sock.getInetAddress();
 				}
@@ -350,7 +359,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 				
 		//clients connect to p1 : players 2 - 4
 		} else {
-			whales[playerNum - 1] = new Whale(playerNum, null, null); //you
+			whales[playerNum - 1] = new Whale(playerNum, null, null, yourName); //you
 			System.out.print("Player 1 IP address: ");
 			String host = scanny.next();
 			System.out.print("Port: ");
@@ -359,10 +368,12 @@ public class SmthAboutWhales extends Application implements Runnable {
 			ObjectOutputStream outputToServer = new ObjectOutputStream(sock.getOutputStream());
 			System.out.println("Connected to player 1");
 			outputToServer.writeObject(playerNum);
+			outputToServer.writeObject(yourName);
+			ObjectInputStream inputFromServer = new ObjectInputStream(sock.getInputStream());
+			clientName = (String) inputFromServer.readObject();
+			System.out.println("You are playing against " + clientName);
 			whales[0] = 
-				new Whale(1, new ObjectInputStream(sock.getInputStream()), 
-					outputToServer);
-			//	while(true);
+				new Whale(1, inputFromServer, outputToServer, clientName);
 		}
 		
 		int portP2, portP3;
@@ -391,10 +402,13 @@ public class SmthAboutWhales extends Application implements Runnable {
 				System.out.println("Accepted a socket: "+ sock);
 				ObjectInputStream inputFromClient = new ObjectInputStream(sock.getInputStream());
 				clientPlayerNum = (int) inputFromClient.readObject();
+				clientName = (String) inputFromClient.readObject();
 				System.out.println("Connected to player " + clientPlayerNum);
+				System.out.println("You are playing against " + clientName);
+				ObjectOutputStream out = new ObjectOutputStream(sock.getOutputStream()); 
+				out.writeObject(yourName);
 				whales[clientPlayerNum - 1] = 
-					new Whale(clientPlayerNum, inputFromClient,
-							new ObjectOutputStream(sock.getOutputStream()));
+					new Whale(clientPlayerNum, inputFromClient, out, clientName);
 				numPlayers++;
 			}	
 		}
@@ -411,19 +425,26 @@ public class SmthAboutWhales extends Application implements Runnable {
 			ObjectOutputStream outputToServer = new ObjectOutputStream(sock.getOutputStream());
 			System.out.println("Connected to player 2");
 			outputToServer.writeObject(playerNum);
+			outputToServer.writeObject(yourName);
+			ObjectInputStream in = new ObjectInputStream(sock.getInputStream());
+			clientName = (String) in.readObject();
+			System.out.println("You are playing against " + clientName);
 			whales[1] = 
-				new Whale(2, new ObjectInputStream(sock.getInputStream()),
-						outputToServer);
+				new Whale(2, in, outputToServer, clientName);
 			//connect to 3
 			System.out.println("Waiting for connection...");
 			sock = srvP3.accept();
 			System.out.println("Accepted a socket: "+ sock);
 			ObjectInputStream inputFromClient = new ObjectInputStream(sock.getInputStream());
 			clientPlayerNum = (int) inputFromClient.readObject();
+			clientName = (String) inputFromClient.readObject();
 			System.out.println("Connected to player " + clientPlayerNum);
+			System.out.println("You are playing against " + clientName);
+			outputToServer = new ObjectOutputStream(sock.getOutputStream());
+			outputToServer.writeObject(yourName);
 			whales[clientPlayerNum - 1] = 
 					new Whale(clientPlayerNum, inputFromClient,
-							new ObjectOutputStream(sock.getOutputStream()));
+						outputToServer, clientName);
 			}
 		//client to 2 and 3
 		if (playerNum == 4) {
@@ -435,9 +456,12 @@ public class SmthAboutWhales extends Application implements Runnable {
 			ObjectOutputStream outputToServer = new ObjectOutputStream(sock.getOutputStream());
 			System.out.println("Connected to player 2");
 			outputToServer.writeObject(playerNum);
+			outputToServer.writeObject(yourName);
+			ObjectInputStream in = new ObjectInputStream(sock.getInputStream());
+			clientName = (String) in.readObject();
 			whales[1] = 
-				new Whale(2, new ObjectInputStream(sock.getInputStream()),
-						outputToServer);
+				new Whale(2, in,
+						outputToServer, clientName);
 			//connect to 3
 			host = (InetAddress) whales[0].recieve.readObject();
 			port = (int) whales[0].recieve.readObject();
@@ -445,11 +469,13 @@ public class SmthAboutWhales extends Application implements Runnable {
 			outputToServer = new ObjectOutputStream(sock.getOutputStream());
 			System.out.println("Connected to player 3");
 			outputToServer.writeObject(playerNum);
+			outputToServer.writeObject(yourName);
+			in = new ObjectInputStream(sock.getInputStream());
+			clientName = (String) in.readObject();
 			whales[2] = 
-				new Whale(3, new ObjectInputStream(sock.getInputStream()),
-						outputToServer);
+				new Whale(3, in,
+						outputToServer, clientName);
 		}
 		return whales; 
 	}
-
 }

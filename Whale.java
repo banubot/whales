@@ -5,6 +5,7 @@ import javafx.scene.image.ImageView;
 import java.util.*;
 import java.net.*; 
 import java.io.*;
+import javafx.scene.text.*;
 
 public class Whale {
 	int playerNum; //1 - 4 
@@ -15,6 +16,7 @@ public class Whale {
 	ObjectOutputStream send;
 	int x;
 	int y;
+	Text name;
 
 	static Image happy = new Image("happy.png");
 	static Image sad = new Image("sad.png");
@@ -22,13 +24,14 @@ public class Whale {
     static final int canvasHeight = 400;
 	static final int canvasWidth = 400;
 
-	public Whale(int playerNum, ObjectInputStream in, ObjectOutputStream out) {
+	public Whale(int playerNum, ObjectInputStream in, 
+			ObjectOutputStream out, String name) {
 		this.playerNum = playerNum;
 		this.alive = true;
 		this.yourTurn = (playerNum == 1);
 		this.displayImg = new ImageView();
 		this.displayImg.setImage(happy);
-			
+		this.name = new Text(name);
 		//you will not have a socket to yourself
 		this.recieve = in;
 		this.send = out;
@@ -49,13 +52,15 @@ public class Whale {
 				break;
 			case 4:
 				this.x = canvasWidth / 2;
-				this.y = canvasHeight - 40;
+				this.y = canvasHeight - 50;
 		} 
 	}
 
 	public void move() {
 		this.displayImg.setLayoutX(this.x);
 		this.displayImg.setLayoutY(this.y);
+		this.name.setLayoutX(this.x);
+		this.name.setLayoutY(this.y + 110);
 	}
 
 	public void kill() {

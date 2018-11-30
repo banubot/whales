@@ -11,7 +11,7 @@ public class Bomb {
 
 	static Image bomb = new Image("bomb.png");
 	static Image explode = new Image("explode.png");
-	static final int MAX = 100; //max units til explode
+	static final int MAX = 50; //max units til explode
 
 	public Bomb() {
 		this.displayImg = new ImageView();
