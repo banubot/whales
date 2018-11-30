@@ -191,7 +191,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 				while (request) {
 					holdTime = (int) slide.getValue();
 					//get the player from the choice box
-					System.out.println(holdTime+"    "+ bomb.explodeCounter);
+					//System.out.println(holdTime+"    "+ bomb.explodeCounter);
 					String next = throwTo.getValue();
 					for (Whale whale : whales) {
 						if (whale.name.getText().equals(next)) {
