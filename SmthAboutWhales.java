@@ -47,10 +47,10 @@ public class SmthAboutWhales extends Application implements Runnable {
 
 
 	public static void gameOver(Whale[] whales) {
-		int winner = 0;
+		Whale winner = null;
 		for (Whale whale : whales) {
 			if (whale.alive) {
-				winner = whale.playerNum;
+				winner = whale;
 			}
 		}
 		status.setText("Game over! " + winner.name.getText() + " wins!!!");
