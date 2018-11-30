@@ -152,13 +152,13 @@ public class SmthAboutWhales extends Application implements Runnable {
 			}
 		} catch (Exception e)  {System.out.println("exception while waiting" +e);} //Will throw interrupted upon notify
 
-		 pane.getChildren().add(bomb.displayImg);
 		 for (Whale whale : whales) {
 			 pane.getChildren().addAll(whale.displayImg, whale.name);
 			 throwTo.getItems().add(whale.name.getText());
 			 whale.move();
 		 }
 
+		 pane.getChildren().add(bomb.displayImg);
 		stage.show();
 	}	
 
@@ -191,7 +191,6 @@ public class SmthAboutWhales extends Application implements Runnable {
 				while (request) {
 					holdTime = (int) slide.getValue();
 					//get the player from the choice box
-					System.out.println(holdTime+"    "+ bomb.explodeCounter);
 					String next = throwTo.getValue();
 					for (Whale whale : whales) {
 						if (whale.name.getText().equals(next)) {
