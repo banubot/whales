@@ -210,8 +210,8 @@ public class SmthAboutWhales extends Application implements Runnable {
 				}
 
 				if (bomb.isExploded()) {
-					bomb.explode();
 					you.kill();
+					bomb.explode();
 					status.setText("You are dead :(");
 					Thread.sleep(4000);
 					bomb.reset();
@@ -236,8 +236,8 @@ public class SmthAboutWhales extends Application implements Runnable {
 								" seconds!");
 						Thread.sleep(4000);
 						if (bomb.isExploded()) {
-							bomb.explode();
 							whale.kill();
+							bomb.explode();
 							throwTo.getItems().remove(whale.name.getText());
 							status.setText(whale.name.getText() +
 									" died :(");
