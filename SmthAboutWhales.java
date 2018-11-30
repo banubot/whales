@@ -90,7 +90,12 @@ public class SmthAboutWhales extends Application implements Runnable {
 		} catch (FileNotFoundException e) {
 			System.out.println("Error: Could not load font.");
 		}
-		
+        Font font2 = null;
+        try {
+            font2 = Font.loadFont(new FileInputStream(new File("font3.otf")), 18);
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: Could not load font.");
+        }
 		//action status - can be changed to things like 
 		//your turn
 		//player _ exploded
@@ -118,6 +123,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 		
 		//hold slider
 		Text slideTxt = new Text("hold");
+        slideTxt.setFont(font2);
 	    slide = new Slider(1, 10, 1);
 		slideTxt.setLayoutX(40);
 		slideTxt.setLayoutY(532);
@@ -130,6 +136,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 		
 		//choose victim
 		Text throwTxt = new Text("throw to");
+        throwTxt.setFont(font2);
 		throwTo = new ChoiceBox<>();
 		throwTo.setStyle("-fx-background-color: #FFFFFF;");
 		throwTxt.setLayoutX(255);
@@ -153,6 +160,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 		} catch (Exception e)  {System.out.println("exception while waiting" +e);} //Will throw interrupted upon notify
 
 		 for (Whale whale : whales) {
+             whale.name.setFont(font2);
 			 pane.getChildren().addAll(whale.displayImg, whale.name);
 			 throwTo.getItems().add(whale.name.getText());
 			 whale.move();
