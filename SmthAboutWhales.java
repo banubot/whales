@@ -247,7 +247,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 							setBomb(you.playerNum, whales, bomb);
 						}
 						status.setText(whale.name.getText() + 
-								" threw the bomb to " + whales[nextPlayer - 1].name);
+								" threw the bomb to " + whales[nextPlayer - 1].name.getText());
 						Thread.sleep(4000);
 					}
 				}
