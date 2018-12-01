@@ -2,9 +2,12 @@ Sample commands for program
 
 To compile:
 make should compile all files.
+If it doesn't work, use
+javac SmthAboutWhales.java
+javac Whale.java
+javac Bomb.java
 
 Command examples:
-
 To start first player 1/server:
 java SmthAboutWhales
 <Welcome to the ocean! What player are you?> 1
