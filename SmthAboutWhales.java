@@ -90,7 +90,12 @@ public class SmthAboutWhales extends Application implements Runnable {
 		} catch (FileNotFoundException e) {
 			System.out.println("Error: Could not load font.");
 		}
-		
+        Font font2 = null;
+        try {
+            font2 = Font.loadFont(new FileInputStream(new File("font3.otf")), 18);
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: Could not load font.");
+        }
 		//action status - can be changed to things like 
 		//your turn
 		//player _ exploded
@@ -118,6 +123,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 		
 		//hold slider
 		Text slideTxt = new Text("hold");
+        slideTxt.setFont(font2);
 	    slide = new Slider(1, 10, 1);
 		slideTxt.setLayoutX(40);
 		slideTxt.setLayoutY(532);
@@ -130,6 +136,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 		
 		//choose victim
 		Text throwTxt = new Text("throw to");
+        throwTxt.setFont(font2);
 		throwTo = new ChoiceBox<>();
 		throwTo.setStyle("-fx-background-color: #FFFFFF;");
 		throwTxt.setLayoutX(255);
@@ -152,13 +159,14 @@ public class SmthAboutWhales extends Application implements Runnable {
 			}
 		} catch (Exception e)  {System.out.println("exception while waiting" +e);} //Will throw interrupted upon notify
 
-		 pane.getChildren().add(bomb.displayImg);
 		 for (Whale whale : whales) {
+             whale.name.setFont(font2);
 			 pane.getChildren().addAll(whale.displayImg, whale.name);
 			 throwTo.getItems().add(whale.name.getText());
 			 whale.move();
 		 }
 
+		 pane.getChildren().add(bomb.displayImg);
 		stage.show();
 	}	
 
@@ -191,7 +199,6 @@ public class SmthAboutWhales extends Application implements Runnable {
 				while (request) {
 					holdTime = (int) slide.getValue();
 					//get the player from the choice box
-					System.out.println(holdTime+"    "+ bomb.explodeCounter);
 					String next = throwTo.getValue();
 					for (Whale whale : whales) {
 						if (whale.name.getText().equals(next)) {
@@ -211,8 +218,8 @@ public class SmthAboutWhales extends Application implements Runnable {
 				}
 
 				if (bomb.isExploded()) {
-					bomb.explode();
 					you.kill();
+					bomb.explode();
 					status.setText("You are dead :(");
 					Thread.sleep(4000);
 					bomb.reset();
@@ -237,8 +244,8 @@ public class SmthAboutWhales extends Application implements Runnable {
 								" seconds!");
 						Thread.sleep(4000);
 						if (bomb.isExploded()) {
-							bomb.explode();
 							whale.kill();
+							bomb.explode();
 							throwTo.getItems().remove(whale.name.getText());
 							status.setText(whale.name.getText() +
 									" died :(");
