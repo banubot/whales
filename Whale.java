@@ -19,7 +19,6 @@ public class Whale {
 	Text name;
 
 	static Image happy = new Image("happy.png");
-	static Image sad = new Image("sad.png");
 	static Image dead = new Image("dead.png");
     static final int canvasHeight = 400;
 	static final int canvasWidth = 400;
