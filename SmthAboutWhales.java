@@ -334,7 +334,7 @@ public class SmthAboutWhales extends Application implements Runnable {
 			ServerSocket sv = new ServerSocket(1200);
 			InetAddress inetAddr = sv.getInetAddress();
 			System.out.println("Server established at address " 
-					+ inetAddr + " port " + sv.getLocalPort());
+					+ InetAddress.getLocalHost() + " port " + sv.getLocalPort());
 			whales[0] = new Whale(1, null, null, yourName);
 			numPlayers = 1;
 			while (numPlayers < 4) {
